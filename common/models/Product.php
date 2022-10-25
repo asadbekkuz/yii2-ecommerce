@@ -19,7 +19,7 @@ use Yii;
  * @property int|null $updated_by
  *
  * @property CartItem[] $cartItems
- * @property OrdersItems[] $ordersItems
+ * @property OrderItem[] $ordersItems
  */
 class Product extends \yii\db\ActiveRecord
 {
@@ -37,7 +37,7 @@ class Product extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'description', 'image', 'price'], 'required'],
+            [['name', 'description', 'price'], 'required'],
             [['price'], 'number'],
             [['status', 'created_at', 'updated_at', 'created_by', 'updated_by'], 'integer'],
             [['name', 'description', 'image'], 'string', 'max' => 255],
@@ -53,9 +53,9 @@ class Product extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
             'description' => 'Description',
-            'image' => 'Image',
+            'image' => 'Product Image',
             'price' => 'Price',
-            'status' => 'Status',
+            'status' => 'Published',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'created_by' => 'Created By',
@@ -76,11 +76,11 @@ class Product extends \yii\db\ActiveRecord
     /**
      * Gets query for [[OrdersItems]].
      *
-     * @return \yii\db\ActiveQuery|\common\models\query\OrdersItemsQuery
+     * @return \yii\db\ActiveQuery|\common\models\query\OrderItemQuery
      */
     public function getOrdersItems()
     {
-        return $this->hasMany(OrdersItems::className(), ['product_id' => 'id']);
+        return $this->hasMany(OrderItem::className(), ['product_id' => 'id']);
     }
 
     /**

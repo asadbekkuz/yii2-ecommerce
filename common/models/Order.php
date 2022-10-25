@@ -17,8 +17,8 @@ use Yii;
  * @property int|null $created_at
  * @property int|null $created_by
  *
- * @property OrderAddresses[] $orderAddresses
- * @property OrdersItems[] $ordersItems
+ * @property OrderAddress[] $orderAddresses
+ * @property OrderItem[] $ordersItems
  */
 class Order extends \yii\db\ActiveRecord
 {
@@ -27,7 +27,7 @@ class Order extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'orders';
+        return '{{%orders}}';
     }
 
     /**
@@ -64,21 +64,21 @@ class Order extends \yii\db\ActiveRecord
     /**
      * Gets query for [[OrderAddresses]].
      *
-     * @return \yii\db\ActiveQuery|\common\models\query\OrderAddressesQuery
+     * @return \yii\db\ActiveQuery|\common\models\query\OrderAddressQuery
      */
     public function getOrderAddresses()
     {
-        return $this->hasMany(OrderAddresses::className(), ['order_id' => 'id']);
+        return $this->hasMany(OrderAddress::className(), ['order_id' => 'id']);
     }
 
     /**
      * Gets query for [[OrdersItems]].
      *
-     * @return \yii\db\ActiveQuery|\common\models\query\OrdersItemsQuery
+     * @return \yii\db\ActiveQuery|\common\models\query\OrderItemQuery
      */
     public function getOrdersItems()
     {
-        return $this->hasMany(OrdersItems::className(), ['order_id' => 'id']);
+        return $this->hasMany(OrderItem::className(), ['order_id' => 'id']);
     }
 
     /**
