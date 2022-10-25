@@ -22,14 +22,10 @@ use yii\bootstrap5\ActiveForm;
 
     <?= $form->field($model, 'image', [
         'template' => '
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
-                    </div>
-                    <div class="custom-file">
-                        {input}
-                        {label}
-                    </div>
+                <div class="custom-file">
+                    {input}
+                    {label}
+                    {error}
                 </div>
         ',
         'inputOptions'=>['class'=>'custom-file-input'],
