@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\BlameableBehavior;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\FileHelper;
 use yii\web\UploadedFile;
@@ -39,6 +41,13 @@ class Product extends ActiveRecord
     {
         return '{{%products}}';
     }
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class,
+            BlameableBehavior::class
+        ];
+    }
 
     /**
      * {@inheritdoc}
@@ -46,7 +55,7 @@ class Product extends ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'description', 'price'], 'required'],
+            [['name', 'price'], 'required'],
             [['imageFile'],'image','extensions'=>'png,jpg,jpeg','maxSize'=>5 * 1024 * 1024],
             [['price'], 'number'],
             [['status', 'created_at', 'updated_at', 'created_by', 'updated_by'], 'integer'],
