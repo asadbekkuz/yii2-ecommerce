@@ -7,11 +7,17 @@ use yii\bootstrap5\ActiveForm;
 /** @var yii\web\View $this */
 /** @var common\models\Product $model */
 /** @var yii\widgets\ActiveForm $form */
+
 ?>
 
 <div class="product-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+            'options'=>[
+                    'enctype'=>'multipart/form-data',
+                    'method'=>'post'
+            ]
+    ]); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
@@ -20,7 +26,7 @@ use yii\bootstrap5\ActiveForm;
         'preset' => 'basic'
     ]) ?>
 
-    <?= $form->field($model, 'image', [
+    <?= $form->field($model, 'imageFile', [
         'template' => '
                 <div class="custom-file">
                     {input}
@@ -30,7 +36,7 @@ use yii\bootstrap5\ActiveForm;
         ',
         'inputOptions'=>['class'=>'custom-file-input'],
         'labelOptions'=>['class'=>'custom-file-label']
-        ])->fileInput() ?>
+        ])->textInput(['type'=>'file'])?>
 
     <?= $form->field($model, 'price')->textInput([
         'type' => 'number'
