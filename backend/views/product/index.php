@@ -33,7 +33,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         'width'=>'60px'
                 ]
             ],
-            'name',
+            [
+                'attribute'=>'name',
+                'contentOptions'=>[
+                        'width'=>'90px'
+                ]
+            ],
             [
                 'attribute'=>'image',
                 'content'=>function($model){
@@ -45,7 +50,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]);
                 }
             ],
-            'price',
+            [
+                'attribute'=>'price',
+                'contentOptions'=>[
+                        'width'=>'80px'
+                ]
+            ],
             [
                 'attribute'=>'status',
                 'content'=>function($model){
