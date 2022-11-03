@@ -31,14 +31,24 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             'name',
-            'description',
-            'image',
+            'description:html',
+            [
+                'attribute'=>'image',
+                /** @var \common\models\Product $model */
+                'value'=>fn($model)=>Html::img($model->getImgUrl(),['style'=>'width:80px']),
+                'format'=>['html']
+            ],
             'price',
-            'status',
-            'created_at',
-            'updated_at',
-            'created_by',
-            'updated_by',
+            [
+                'attribute'=>'status',
+                'format'=>['html'],
+                /** @var \common\models\Product $model */
+                'value'=>fn($model)=>$model->getStatus($model->status)
+            ],
+            'created_at:datetime',
+            'updated_at:datetime',
+            'createdBy.username',
+            'updatedBy.username',
         ],
     ]) ?>
 
