@@ -7,6 +7,7 @@ use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\FileHelper;
+use yii\helpers\Html;
 use yii\web\UploadedFile;
 
 /**
@@ -128,5 +129,16 @@ class Product extends ActiveRecord
             $transaction->commit();
         }
         return $saveModel;
+    }
+
+    public function getImgUrl()
+    {
+        return '/frontend/web/storage'.$this->image;
+    }
+
+    public function getStatus(?int $status)
+    {
+        return Html::tag('span',$status === 1 ? 'Active' : 'Draft',[
+            'class'=> $status === 1 ? 'badge badge-success' : 'badge badge-danger']);
     }
 }
