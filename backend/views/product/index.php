@@ -9,6 +9,7 @@ use yii\grid\GridView;
 /** @var yii\web\View $this */
 /** @var backend\models\search\ProductSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
+/** @var common\models\Product $model */
 
 $this->title = 'Products';
 $this->params['breadcrumbs'][] = $this->title;
@@ -21,24 +22,44 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Create Product', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
+            [
+                'attribute'=>'id',
+                'contentOptions'=>[
+                        'width'=>'60px'
+                ]
+            ],
             'name',
-            'description',
-            'image',
+            [
+                'attribute'=>'image',
+                'content'=>function($model){
+                    /**
+                     * @var \common\models\Product $model
+                     */
+                    return Html::img($model->getImgUrl(),[
+                            'style'=>'width:80px'
+                    ]);
+                }
+            ],
             'price',
-            //'status',
-            //'created_at',
-            //'updated_at',
-            //'created_by',
-            //'updated_by',
+            [
+                'attribute'=>'status',
+                'content'=>function($model){
+                    /**
+                     * @var \common\models\Product $model
+                     */
+                    return $model->getStatus($model->status);
+                },
+                'contentOptions'=>[
+                        'width'=>'40px'
+                ]
+            ],
+            'created_at:datetime',
+            'updated_at:datetime',
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, Product $model, $key, $index, $column) {
