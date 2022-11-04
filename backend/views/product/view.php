@@ -10,6 +10,7 @@ $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Products', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
+
 ?>
 <div class="product-view">
 
@@ -31,7 +32,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             'name',
-            'description:html',
+            [
+                'attribute'=>'description',
+                'format'=>['html']
+            ],
             [
                 'attribute'=>'image',
                 /** @var \common\models\Product $model */
