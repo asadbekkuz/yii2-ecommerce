@@ -59,6 +59,7 @@ class Product extends ActiveRecord
             [['name', 'price'], 'required'],
             [['imageFile'],'image','extensions'=>'png,jpg,jpeg','maxSize'=>5 * 1024 * 1024],
             [['price'], 'number'],
+            [['description'],'string'],
             [['status', 'created_at', 'updated_at', 'created_by', 'updated_by'], 'integer'],
             [['name', 'image'], 'string', 'max' => 255],
         ];
