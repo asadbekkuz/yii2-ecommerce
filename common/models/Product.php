@@ -8,6 +8,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\FileHelper;
 use yii\helpers\Html;
+use yii\helpers\StringHelper;
 use yii\web\UploadedFile;
 
 /**
@@ -151,5 +152,19 @@ class Product extends ActiveRecord
     {
         return Html::tag('span',$status === 1 ? 'Active' : 'Draft',[
             'class'=> $status === 1 ? 'badge badge-success' : 'badge badge-danger']);
+    }
+    /**
+    *  Get the Description without tags and white spaces
+    */
+    public function getShortDescription()
+    {
+        return StringHelper::truncateWords(strip_tags($this->description),30);
+    }
+    /**
+    *  Get Currency price
+    */
+    public function getCurrencyPrice()
+    {
+      return  Yii::$app->formatter->asCurrency($this->price);
     }
 }
