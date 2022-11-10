@@ -5,7 +5,6 @@
 
 use common\widgets\Alert;
 use frontend\assets\AppAsset;
-use yii\bootstrap5\Breadcrumbs;
 use yii\bootstrap5\Html;
 use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
@@ -36,10 +35,23 @@ AppAsset::register($this);
     ]);
     $menuItems[] = ['label' => 'Home', 'url' => ['/site/index']];
     if (Yii::$app->user->isGuest) {
-        array_push($menuItems,
+        $menuItems=[
             ['label' => 'Signup', 'url' => ['/site/signup']],
             ['label' => 'Login', 'url' => ['/site/login']],
-        );
+        ];
+    }else{
+        $menuItems[] =[
+            'label' => Yii::$app->user->identity->getDisplayName(),
+            'items'=>[
+                ['label' => 'Profile', 'url' => ['/profile/index']],
+                [
+                    'label' => 'Logout',
+                    'linkOptions'=>[
+                            'data-method'=>'post'
+                    ],
+                    'url' => ['/site/logout']],
+            ]
+        ];
     }
 
     echo Nav::widget([
@@ -48,14 +60,6 @@ AppAsset::register($this);
         ],
         'items' => $menuItems,
     ]);
-    if (!Yii::$app->user->isGuest) {
-        echo Html::beginForm(['/site/logout'], 'post', ['class' => 'd-flex'])
-            . Html::submitButton(
-                'Logout (' . Yii::$app->user->identity->username . ')',
-                ['class' => 'btn btn-link logout text-decoration-none']
-            )
-            . Html::endForm();
-    }
     NavBar::end();
     ?>
 </header>

@@ -5,6 +5,7 @@ namespace common\models;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
@@ -22,13 +23,17 @@ use yii\web\IdentityInterface;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $password write-only password
+ * @property string $passwordConfirm write-only password
+ * @var  UserAddress[ $addresses
  */
 class User extends ActiveRecord implements IdentityInterface
 {
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;
-
+//    public array $addresses = [];
+    public string  $password = '';
+    public string  $passwordConfirm = '';
 
     /**
      * {@inheritdoc}
@@ -54,6 +59,8 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
+            [['firstname','lastname','username','email'],'required'],
+            [['firstname','lastname','username','email'],'string','max'=>255],
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
         ];
@@ -153,7 +160,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * {@inheritdoc}
      */
-    public function validateAuthKey($authKey)
+    public function validateAuthKey($authKey) : string
     {
         return $this->getAuthKey() === $authKey;
     }
@@ -164,7 +171,7 @@ class User extends ActiveRecord implements IdentityInterface
      * @param string $password password to validate
      * @return bool if password provided is valid for current user
      */
-    public function validatePassword($password)
+    public function validatePassword(string $password)
     {
         return Yii::$app->security->validatePassword($password, $this->password_hash);
     }
@@ -174,7 +181,7 @@ class User extends ActiveRecord implements IdentityInterface
      *
      * @param string $password
      */
-    public function setPassword($password)
+    public function setPassword(string $password)
     {
         $this->password_hash = Yii::$app->security->generatePasswordHash($password);
     }
@@ -211,8 +218,29 @@ class User extends ActiveRecord implements IdentityInterface
         $this->password_reset_token = null;
     }
 
-    public function getDisplayName()
+    /**
+     *  Get user name
+     */
+    public function getDisplayName() : string
     {
-        return $this->username;
+        $fullname = trim($this->firstname.' '.$this->lastname);
+        return $fullname;
+    }
+
+    /**
+    *   Get user Addresses, one user sale more products in some addresses
+    */
+    public function getAddresses() : ActiveQuery
+    {
+        return $this->hasMany(UserAddress::class,['user_id'=>'id']);
+    }
+    /**
+    *   Get User address or Null
+    */
+    public function getAddress()
+    {
+        $address = $this->addresses[0] ?? new UserAddress();
+        $address->user_id = $this->id;
+        return $address;
     }
 }
