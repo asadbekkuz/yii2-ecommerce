@@ -4,9 +4,27 @@ namespace frontend\controllers;
 
 use Yii;
 use common\models\User;
+use yii\filters\AccessControl;
+use yii\web\ForbiddenHttpException;
 
 class ProfileController extends \yii\web\Controller
 {
+    public function behaviors()
+    {
+        return [
+            'access'=>[
+                'class'=>AccessControl::class,
+                'rules' => [
+                    [
+                        'actions' => ['index','update-address','update-account'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ]
+        ];
+    }
+
     /**
     *   profile page
     */
@@ -25,6 +43,9 @@ class ProfileController extends \yii\web\Controller
     */
     public function actionUpdateAddress() : string
     {
+        if(!Yii::$app->request->isAjax){
+            throw new ForbiddenHttpException('Your are only allowed to make ajax request');
+        }
         /** @var User $user */
         $user = Yii::$app->user->identity;
         $userAddress = $user->getAddress();
@@ -43,6 +64,9 @@ class ProfileController extends \yii\web\Controller
     */
     public function actionUpdateAccount() : string
     {
+        if(!Yii::$app->request->isAjax){
+            throw new ForbiddenHttpException('Your are only allowed to make ajax request');
+        }
         /** @var User $user */
         $user = Yii::$app->user->identity;
         $success = false;
