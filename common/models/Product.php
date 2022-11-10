@@ -143,9 +143,9 @@ class Product extends ActiveRecord
     public function getImgUrl()
     {
         if($this->image){
-            return '/frontend/web/storage'.$this->image;
+            return Yii::$app->request->baseUrl.'/storage'.$this->image;
         }
-        return '/frontend/web/img/no-image.png';
+        return Yii::$app->request->baseUrl.'/img/no-image.png';
     }
 
     public function getStatus(?int $status)
@@ -158,7 +158,7 @@ class Product extends ActiveRecord
     */
     public function getShortDescription()
     {
-        return StringHelper::truncateWords(strip_tags($this->description),30);
+        return StringHelper::truncateWords(strip_tags($this->description),20);
     }
     /**
     *  Get Currency price

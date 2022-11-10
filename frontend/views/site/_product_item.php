@@ -6,20 +6,16 @@
  */
 /** @var \common\models\Product $model */
 ?>
-<div class="card h-100">
-    <a href="#" class="img-wrapper">
-        <img class="card-img-top" src="<?php echo $model->getImgUrl() ?>" alt="">
-    </a>
+<div class="card" style="width:304px; height: 450px">
+    <img src="<?php echo $model->getImgUrl() ?>" style="width:302px;height: 194px; object-fit: fill" class="card-img-top" alt="...">
     <div class="card-body">
-        <h5 class="card-title">
-            <a href="#" class="text-dark"><?php echo \yii\helpers\StringHelper::truncateWords($model->name, 20) ?></a>
-        </h5>
-        <h5>$<?php echo $model->price ?></h5>
-        <div class="card-text">
-            <?php echo $model->getShortDescription() ?>
-        </div>
+        <h5 class="card-title"><?php echo \yii\helpers\StringHelper::truncateWords($model->name,20) ?></h5>
+        <p class="card-text" style="width: 270px;height: 96px"><?php echo $model->getShortDescription() ?></p>
     </div>
-    <div class="card-footer">
+    <div class="text-dark opacity-75" style="padding-left: 17px">
+        $<?php echo $model->price ?>
+    </div>
+    <div class="card-body">
         <a href="<?php echo \yii\helpers\Url::to(['/cart/add']) ?>" class="btn btn-primary btn-add-to-cart">
             Add to Cart
         </a>
