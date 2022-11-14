@@ -9,7 +9,7 @@ use Yii;
 use yii\base\InvalidArgumentException;
 use yii\data\ActiveDataProvider;
 use yii\web\BadRequestHttpException;
-use yii\web\Controller;
+use frontend\base\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use common\models\LoginForm;
