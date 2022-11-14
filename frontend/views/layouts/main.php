@@ -9,6 +9,7 @@ use yii\bootstrap5\Html;
 use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
 
+$cartItems = $this->params['cartItem'];
 AppAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
@@ -33,7 +34,10 @@ AppAsset::register($this);
             'class' => 'navbar navbar-expand-md  navbar-dark bg-dark fixed-top',
         ],
     ]);
-    $menuItems[] = ['label' => 'Home', 'url' => ['/site/index']];
+    $menuItems[] = [
+        'label' => "Cart <span class='badge bg-danger' id='product-counter'>".$cartItems."</span>",
+        'url' => ['/cart/index'],
+    ];
     if (Yii::$app->user->isGuest) {
         $menuItems=[
             ['label' => 'Signup', 'url' => ['/site/signup']],
@@ -59,6 +63,7 @@ AppAsset::register($this);
                 'class' => 'navbar-nav ms-auto',
         ],
         'items' => $menuItems,
+        'encodeLabels'=> false,
     ]);
     NavBar::end();
     ?>
