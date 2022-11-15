@@ -31,14 +31,16 @@ class CartController extends Controller
 
     /**
      *   Deploy products that user add to cart
+     * @throws \yii\base\InvalidConfigException
      */
-    public function actionIndex()
+    public function actionIndex() : string
     {
         if (\Yii::$app->user->isGuest) {
-            //todo session
+            $cartItem = Yii::$app->session->get(CartItem::SESSION_KEY, []);
         } else {
             $cartItem = CartItem::findBySql("
                SELECT
+                    c.product_id as id,
                     p.name,
                     p.image,
                     p.price,
@@ -53,26 +55,43 @@ class CartController extends Controller
                 ->all();
         }
         return $this->render('index', [
-            'item' => $cartItem
+            'items' => $cartItem
         ]);
     }
 
     /**
      *   click 'add' button add product to cart basket
+     * @throws NotFoundHttpException
      */
-    public function actionAdd(): array
+    public function actionAdd()
     {
         $userId = Yii::$app->user->id;
         $productId = Yii::$app->request->post('id');
         $productItem = Product::find()->id($productId)->published()->one();
         if (!$productItem) {
-            throw new NotFoundHttpException('Product does not exsist');
+            throw new NotFoundHttpException('Product don\'t exsist');
         }
-
         if (\Yii::$app->user->isGuest) {
-            return [
-                'success' => false
-            ];
+            $cartItems = \Yii::$app->session->get(CartItem::SESSION_KEY, []);
+            $flag = false;
+            foreach ($cartItems as &$item) {
+                if ($item['id'] == $productId) {
+                    $item['quantity']++;
+                    $flag = true;
+                }
+            }
+            if (!$flag) {
+                $cartItem = [
+                    'id' => $productId,
+                    'name' => $productItem->name,
+                    'image' => $productItem->image,
+                    'price' => $productItem->price,
+                    'quantity' => 1,
+                    'total_price' => $productItem->price,
+                ];
+                $cartItems[] = $cartItem;
+            }
+            \Yii::$app->session->set(CartItem::SESSION_KEY, $cartItems);
         } else {
             $cartItem = CartItem::find()->userId($userId)->productId($productId)->one();
             if ($cartItem) {
@@ -83,16 +102,16 @@ class CartController extends Controller
                 $cartItem->product_id = $productId;
                 $cartItem->quantity = 1;
             }
+            if ($cartItem->save()) {
+                return [
+                    'success' => true,
+                ];
+            } else {
+                return [
+                    'success' => false,
+                    'errors' => $cartItem->errors
+                ];
+            }
         }
-        if ($cartItem->save()) {
-            return [
-                'success' => true,
-            ];
-        }
-
-        return [
-            'success' => false,
-            'errors' => $cartItem->errors
-        ];
     }
 }
