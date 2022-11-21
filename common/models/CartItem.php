@@ -27,6 +27,24 @@ class CartItem extends \yii\db\ActiveRecord
         return 'cart_item';
     }
 
+    public static function getTotalQuantity(?int $currUserId)
+    {
+        if (isGuest()) {
+            $sum = 0;
+            $cartItems = Yii::$app->session->get(CartItem::SESSION_KEY, []);
+            foreach ($cartItems as &$cartItem) {
+                $sum += $cartItem['quantity'];
+            }
+        } else {
+            $sum = CartItem::findBySql("
+                SELECT SUM(quantity) 
+                FROM cart_item 
+                WHERE user_id = :user_id", ['user_id' => $currUserId])
+                ->scalar();
+        }
+        return $sum;
+    }
+
     /**
      * {@inheritdoc}
      */

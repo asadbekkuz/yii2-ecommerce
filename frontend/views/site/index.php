@@ -18,7 +18,8 @@ $this->title = 'My Yii Application';
         ],
         'layout'=>'{items}{pager}',
         'itemOptions' => [
-            'class' => 'col-lg-4 col-md-6 mb-4 product-item'
+            'class' => 'col-lg-4 col-md-6 mb-4 product-item',
+            'data-url'=>\yii\helpers\Url::to(['/cart/add'])
         ],
         'pager'=>[
                 'class'=>\yii\bootstrap5\LinkPager::class,

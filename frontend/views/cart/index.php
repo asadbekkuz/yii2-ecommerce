@@ -25,7 +25,7 @@ use common\models\Product;
                 </thead>
                 <tbody>
                 <?php foreach ($items as $item): ?>
-                    <tr>
+                    <tr class="row-item-quantity" data-key="<?php echo $item['id'] ?>" data-url="<?php echo \yii\helpers\Url::to(['/cart/change-quantity']) ?>">
                         <td class="text-center"><?php echo $item['name'] ?></td>
                         <td>
                             <img
@@ -34,10 +34,17 @@ use common\models\Product;
                                     style="width: 50px;">
                         </td>
                         <td><?php echo $item['price'] ?></td>
-                        <td><?php echo $item['quantity'] ?></td>
+                        <td>
+                            <input
+                                    type="number"
+                                    min="1"
+                                    class="form-control cart-item-quantity"
+                                    style="width:64px"
+                                    value="<?php echo $item['quantity'] ?>">
+                        </td>
                         <td><?php echo $item['total_price'] ?></td>
                         <td>
-                            <?php echo \yii\helpers\Html::a('Delete',['/cart/delete'],[
+                            <?php echo \yii\helpers\Html::a('Delete',['/cart/delete','id'=>$item['id']],[
                                 'class'=>'btn btn-sm btn-outline-danger',
                                 'data-method'=>'post',
                                 'data-confirm'=> 'Are you sure to remove product item from cart ?'
@@ -49,7 +56,7 @@ use common\models\Product;
             </table>
         </div>
         <div class="card-body text-end">
-            <?php echo \yii\helpers\Html::a('Delete',['/cart/checkout'],[
+            <?php echo \yii\helpers\Html::a('Checkout',\yii\helpers\Url::to(['/cart/checkout']),[
                     'class'=>'btn btn-primary '
             ]) ?>
         </div>
