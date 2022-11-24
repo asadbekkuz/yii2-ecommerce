@@ -3,7 +3,10 @@
 namespace frontend\controllers;
 
 
+use common\models\Order;
+use common\models\OrderAddress;
 use common\models\Product;
+use common\models\User;
 use Yii;
 use common\models\CartItem;
 use yii\filters\ContentNegotiator;
@@ -22,7 +25,7 @@ class CartController extends Controller
         return [
             [
                 'class' => ContentNegotiator::class,
-                'only' => ['add','change-quantity'],
+                'only' => ['add', 'change-quantity'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON
                 ]
@@ -170,11 +173,11 @@ class CartController extends Controller
             Yii::$app->session->set(CartItem::SESSION_KEY, $cartItems);
         }
         if (!isGuest()) {
-            $productItem['quantity'] = $productQuantity ;
+            $productItem['quantity'] = $productQuantity;
             if ($productItem->save()) {
                 return [
                     'success' => true,
-                    'quantity'=>CartItem::getTotalQuantity(currUserId())
+                    'quantity' => CartItem::getTotalQuantity(currUserId())
                 ];
             }
 
@@ -186,7 +189,42 @@ class CartController extends Controller
         }
         return [
             'success' => true,
-            'quantity'=>CartItem::getTotalQuantity(currUserId())
+            'quantity' => CartItem::getTotalQuantity(currUserId())
         ];
+    }
+
+    /**
+     *   Action checkout
+     */
+    public function actionCheckout()
+    {
+
+        $order = new Order();
+        $orderAddress = new OrderAddress();
+        $productQuantity = CartItem::getTotalQuantity(currUserId());
+        $totalPrice = CartItem::getTotalPrice(currUserId());
+
+        if (!isGuest()) {
+            /** @var User $user */
+            $user = Yii::$app->user->identity;
+            $userAddress = $user->getAddress();
+            $order->firstname = $user->firstname;
+            $order->lastname = $user->lastname;
+            $order->email = $user->email;
+            $order->status = Order::STATUS_DRAFT;
+
+            $orderAddress->address = $userAddress->address;
+            $orderAddress->city = $userAddress->city;
+            $orderAddress->state = $userAddress->state;
+            $orderAddress->country = $userAddress->country;
+            $orderAddress->zipcode = $userAddress->zipcode;
+        }
+
+        return $this->render('checkout', [
+            'order' => $order,
+            'orderAddress' => $orderAddress,
+            'productQuantity' => $productQuantity,
+            'totalPrice' => $totalPrice
+        ]);
     }
 }
