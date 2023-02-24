@@ -28,7 +28,7 @@ $(function (){
             success:function (data){
                 if(data.success){
                     $productCount.text(data.quantity);
-                }
+                 }
             }
         })
     })

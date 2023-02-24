@@ -31,4 +31,14 @@ class OrderQuery extends \yii\db\ActiveQuery
     {
         return parent::one($db);
     }
+
+    public function paid()
+    {
+        return $this->andWhere(['status'=>1])->sum('total_price') ?: 0;
+    }
+
+    public function orderCount()
+    {
+        return $this->andWhere(['status'=>1])->count();
+    }
 }

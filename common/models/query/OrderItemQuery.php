@@ -31,4 +31,11 @@ class OrderItemQuery extends \yii\db\ActiveQuery
     {
         return parent::one($db);
     }
+
+    public function soldProduct()
+    {
+        return $this->alias('ot')
+            ->innerJoin(['o'=>'orders'],'o.id=ot.order_id')
+            ->andWhere(['o.status'=>1])->sum('ot.quantity');
+    }
 }

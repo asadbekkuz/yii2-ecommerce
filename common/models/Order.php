@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\db\Exception;
 
 /**
  * This is the model class for table "orders".
@@ -23,6 +24,8 @@ use Yii;
 class Order extends \yii\db\ActiveRecord
 {
     const STATUS_DRAFT = 0;
+    const STATUS_COMPLETED = 1;
+    const STATUS_FAILURED = 2;
     /**
      * {@inheritdoc}
      */
@@ -90,4 +93,49 @@ class Order extends \yii\db\ActiveRecord
     {
         return new \common\models\query\OrderQuery(get_called_class());
     }
+
+    public function saveOrderItems($id)
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        $cartItems = CartItem::getItemsForUser(currUserId());
+        foreach ($cartItems as $cartItem) {
+            $orderItem = new OrderItem();
+            $orderItem->product_name = $cartItem['name'];
+            $orderItem->product_id = $cartItem['id'];
+            $orderItem->unit_price = $cartItem['price'];
+            $orderItem->order_id = $id;
+            $orderItem->quantity = $cartItem['quantity'];
+            if(!$orderItem->save()){
+                throw new Exception('Order items was not save:'.implode('<br/>',$orderItem->getFirstErrors()));
+            }
+        }
+        $transaction->commit();
+        return true;
+    }
+
+    public function saveOrder($postData,$totalPrice): bool
+    {
+        $order = new Order();
+        $orderAddress = new OrderAddress();
+        $order->total_price = $totalPrice;
+        $order->status = Order::STATUS_DRAFT;
+        $order->created_at = time();
+        if($order->load($postData) && $order->save()){
+            $order->refresh();
+            if($order->saveOrderAddress($postData,$order->id) && $order->saveOrderItems($order->id)){
+                return true;
+            }
+        }
+        return false;
+    }
+    public function saveOrderAddress($postData,$id): bool
+    {
+        $orderAddress = new OrderAddress();
+        $orderAddress->order_id = $id;
+        if($orderAddress->load($postData) && $orderAddress->save()){
+            return true;
+        }
+        return false;
+    }
+
 }

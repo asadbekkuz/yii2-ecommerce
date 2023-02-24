@@ -85,4 +85,6 @@ class OrderItem extends \yii\db\ActiveRecord
     {
         return new \common\models\query\OrderItemQuery(get_called_class());
     }
+
+
 }

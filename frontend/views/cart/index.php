@@ -42,7 +42,7 @@ use common\models\Product;
                                     style="width:64px"
                                     value="<?php echo $item['quantity'] ?>">
                         </td>
-                        <td><?php echo $item['total_price'] ?></td>
+                        <td class="total-price"><?php echo $item['total_price'] ?></td>
                         <td>
                             <?php echo \yii\helpers\Html::a('Delete',['/cart/delete','id'=>$item['id']],[
                                 'class'=>'btn btn-sm btn-outline-danger',

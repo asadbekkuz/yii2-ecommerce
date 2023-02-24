@@ -9,6 +9,7 @@ use yii\db\ActiveRecord;
 use yii\helpers\FileHelper;
 use yii\helpers\Html;
 use yii\helpers\StringHelper;
+use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 
 /**
@@ -43,6 +44,15 @@ class Product extends ActiveRecord
     public static function tableName()
     {
         return '{{%products}}';
+    }
+
+    public static function getProduct($productId)
+    {
+        $productItem = Product::find()->id($productId)->published()->one();
+        if (!$productItem) {
+            throw new NotFoundHttpException('Product don\'t exsist');
+        }
+        return $productItem;
     }
 
     public function behaviors()
@@ -175,8 +185,59 @@ class Product extends ActiveRecord
     /**
      *  Get Currency price
      */
-    public function getCurrencyPrice()
+    public function getCurrencyPrice(): string
     {
         return Yii::$app->formatter->asCurrency($this->price);
+    }
+
+    public static function addProductToCart($productId)
+    {
+        $productItem = Product::getProduct($productId);
+        if (isGuest()) {
+            $cartItems = \Yii::$app->session->get(CartItem::SESSION_KEY, []);
+            $flag = false;
+            foreach ($cartItems as &$item) {
+                if ($item['id'] == $productId) {
+                    $item['quantity']++;
+                    $flag = true;
+                }
+            }
+            if (!$flag) {
+                $cartItem = [
+                    'id' => $productId,
+                    'name' => $productItem->name,
+                    'image' => $productItem->image,
+                    'price' => $productItem->price,
+                    'quantity' => 1,
+                    'total_price' => $productItem->price,
+                ];
+                $cartItems[] = $cartItem;
+            }
+            \Yii::$app->session->set(CartItem::SESSION_KEY, $cartItems);
+        }
+        if (!isGuest()) {
+            $cartItem = CartItem::getProductForUser($productId);
+            if ($cartItem) {
+                $cartItem->quantity++;
+            }
+            if (!$cartItem) {
+                $cartItem = new CartItem();
+                $cartItem->user_id = currUserId();
+                $cartItem->product_id = $productId;
+                $cartItem->quantity = 1;
+            }
+            if ($cartItem->save()) {
+                return [
+                    'success' => true,
+                ];
+            }
+            return [
+                'success' => false,
+                'errors' => $cartItem->errors
+            ];
+        }
+        return [
+            'success' => true
+        ];
     }
 }

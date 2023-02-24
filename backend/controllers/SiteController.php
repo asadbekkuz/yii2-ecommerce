@@ -3,9 +3,14 @@
 namespace backend\controllers;
 
 use common\models\LoginForm;
+use common\models\Order;
+use common\models\OrderItem;
+use common\models\User;
+use PhpParser\Node\Expr\Array_;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\Response;
 
@@ -62,7 +67,71 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $totalEarings = Order::find()->paid();
+        $productsSold = OrderItem::find()->soldProduct();
+        $orderMade = Order::find()->orderCount();
+        $totalUser = User::find()->count();
+        $orders = Order::findBySql("
+            SELECT
+                CAST(DATE_FORMAT(FROM_UNIXTIME(created_at),'%Y-%m-%d') AS DATE) as `date`,
+                SUM(total_price) as total_price
+            FROM orders
+            WHERE status = :status
+            GROUP BY CAST(DATE_FORMAT(FROM_UNIXTIME(created_at),'%Y-%m-%d') AS DATE)
+            ORDER BY created_at
+        ",['status'=>Order::STATUS_COMPLETED])
+            ->asArray()
+            ->all();
+       // Line Chart
+       $earningsData = [];
+       $labels = [];
+       if(!empty($orders)){
+           $minDate = $orders[0]['date'];
+           $d = new \DateTime($minDate);
+           $nowDate = new \DateTime();
+           $orderByPriceMap = ArrayHelper::map($orders,'date','total_price');
+           while($d->getTimestamp() < $nowDate->getTimestamp()){
+               $labels[] = $d->format('d/m/Y');
+               $d->setTimestamp($d->getTimestamp() + 86400);
+               $earningsData[] = (float)($orderByPriceMap[$d->format('Y-m-d')] ?? 0);
+           }
+       }
+       // Pie Chart
+       $countriesData = Order::findBySql("
+            SELECT 
+                oa.country as country,SUM(orders.total_price) as total_price
+            FROM orders 
+            INNER JOIN order_addresses oa on orders.id = oa.order_id
+            WHERE orders.status = :status
+            GROUP BY country
+       ",['status'=>Order::STATUS_COMPLETED])
+           ->asArray()
+           ->all();
+       $countries = ArrayHelper::getColumn($countriesData,'country');
+
+//       $bgColors = [];
+//        foreach ($countries as $country) {
+//            $color = "rgb(".rand(0,255).", ".rand(0,255).", ".rand(0,255).")";
+//            $bgColors[] =$color;
+//       }
+        $bgColors = [];
+        $colors = ['#4e73df', '#1cc88a', '#36b9cc'];
+        foreach ($countries as $i => $country) {
+            $bgColors[] = $colors[$i % count($countries)];
+        }
+       $countriesPriceData = ArrayHelper::getColumn($countriesData,'total_price');
+
+        return $this->render('index',[
+            'earings'=>$totalEarings,
+            'products'=>$productsSold,
+            'orderMade'=>$orderMade,
+            'totalUser'=>$totalUser,
+            'data'=>$earningsData,
+            'labels'=>$labels,
+            'bgColors'=>$bgColors,
+            'countriesData'=>$countriesPriceData,
+            'countries'=>$countries
+        ]);
     }
 
     /**

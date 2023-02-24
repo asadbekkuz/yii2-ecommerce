@@ -29,14 +29,14 @@ AppAsset::register($this);
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
         <!-- Sidebar - Brand -->
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="<?php echo Yii::$app->homeUrl ?>">
             <div class="sidebar-brand-text mx-3">Yii2 Ecommerce</div>
         </a>
 
 
         <!-- Nav Item - Dashboard -->
         <li class="nav-item active">
-            <a class="nav-link" href="index.html">
+            <a class="nav-link" href="<?php echo Yii::$app->homeUrl; ?>">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
                 <span>Dashboard</span></a>
         </li>
@@ -44,12 +44,19 @@ AppAsset::register($this);
        <!-- Divider -->
         <hr class="sidebar-divider d-none d-md-block">
 
-        <!-- Nav Item - Charts -->
+        <!-- Products -->
         <li class="nav-item">
             <a class="nav-link" href="<?php echo Url::to(['/product/index']) ?>">
-                <i class="fas fa-fw fa-chart-area"></i>
+                <i class="fas fa-list fa-chart-area"></i>
                 <span>Products</span></a>
         </li>
+        <!-- Orders -->
+        <li class="nav-item">
+            <a class="nav-link" href="<?php echo Url::to(['/order/index']) ?>">
+                <i class="fas fa-money-check fa-chart-area"></i>
+                <span>Orders</span></a>
+        </li>
+
 
         <!-- Sidebar Toggler (Sidebar) -->
         <div class="text-center d-none d-md-inline">
@@ -324,6 +331,7 @@ AppAsset::register($this);
 </div>
 
 <?php $this->endBody() ?>
+<?php echo $this->blocks['BodyEndScript'] ?? ''  ?>
 </body>
 </html>
 <?php $this->endPage();
