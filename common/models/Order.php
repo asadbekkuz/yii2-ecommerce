@@ -4,6 +4,7 @@ namespace common\models;
 
 use Yii;
 use yii\db\Exception;
+use yii\helpers\Html;
 
 /**
  * This is the model class for table "orders".
@@ -24,8 +25,9 @@ use yii\db\Exception;
 class Order extends \yii\db\ActiveRecord
 {
     const STATUS_DRAFT = 0;
-    const STATUS_COMPLETED = 1;
-    const STATUS_FAILURED = 2;
+    const STATUS_PAID = 1;
+    const STATUS_FAILED = 2;
+    const STATUS_COMPLETED = 10;
     /**
      * {@inheritdoc}
      */
@@ -138,4 +140,39 @@ class Order extends \yii\db\ActiveRecord
         return false;
     }
 
+    // get Full Name
+    public function getFullName()
+    {
+        $fullName = $this->firstname.' '.$this->lastname;
+        return $fullName ?? 'Unknown User';
+    }
+    // Html label for Order status
+    public function getStatusLabel($status)
+    {
+        switch ($status){
+            case Order::STATUS_DRAFT:
+                $label = Html::tag('span','Draft',['class'=>'badge badge-secondary']);
+            break;
+            case Order::STATUS_FAILED:
+                $label = Html::tag('span','Failed',['class'=>'badge badge-danger']);
+            break;
+            case Order::STATUS_PAID:
+                $label = Html::tag('span','Paid',['class'=>'badge badge-primary']);
+            break;
+            case Order::STATUS_COMPLETED:
+                $label = Html::tag('span','Completed',['class'=>'badge badge-success']);
+            break;
+            default: $label ='Error';
+        }
+//        if($status === Order::STATUS_COMPLETED){
+//            $label = Html::tag('span','Completed',['class'=>'btn btn-success btn-sm']);
+//        }else if ($status === Order::STATUS_PAID){
+//            $label = Html::tag('span','Paid',['class'=>'btn btn-primary btn-sm']);
+//        }else if($status === Order::STATUS_FAILED){
+//            $label = Html::tag('span','Failed',['class'=>'btn btn-danger btn-sm']);
+//        }else{
+//            $label = Html::tag('span','Draft',['class'=>'btn btn-secondary btn-sm']);
+//        }
+        return $label;
+    }
 }

@@ -79,7 +79,7 @@ class SiteController extends Controller
             WHERE status = :status
             GROUP BY CAST(DATE_FORMAT(FROM_UNIXTIME(created_at),'%Y-%m-%d') AS DATE)
             ORDER BY created_at
-        ",['status'=>Order::STATUS_COMPLETED])
+        ",['status'=>Order::STATUS_PAID])
             ->asArray()
             ->all();
        // Line Chart
@@ -104,7 +104,7 @@ class SiteController extends Controller
             INNER JOIN order_addresses oa on orders.id = oa.order_id
             WHERE orders.status = :status
             GROUP BY country
-       ",['status'=>Order::STATUS_COMPLETED])
+       ",['status'=>Order::STATUS_PAID])
            ->asArray()
            ->all();
        $countries = ArrayHelper::getColumn($countriesData,'country');
