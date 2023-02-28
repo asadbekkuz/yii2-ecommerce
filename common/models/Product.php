@@ -164,7 +164,7 @@ class Product extends ActiveRecord
         return $saveModel;
     }
 
-    public function getImgUrl($image) : string
+    public static function getImgUrl($image) : string
     {
         return self::formatImageUrl($image);
     }
