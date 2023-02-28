@@ -97,7 +97,6 @@ class ProductController extends Controller
     {
         $model = $this->findModel($id);
         $model->imageFile = UploadedFile::getInstance($model,'imageFile');
-
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }

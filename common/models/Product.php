@@ -139,10 +139,15 @@ class Product extends ActiveRecord
     }
 
     public function save($runValidation = true, $attributeNames = null)
-    {
-        if(!$this->isNewRecord){
+    {   
+        /*
+         * Remove image and directory, if $model is not is newRecord and imageFile is empty
+         *
+         *  */
+        if(!$this->isNewRecord && $this->imageFile !== null){
             $this->removeImageDirectory($this->image);
         }
+
         if ($this->imageFile) {
             $this->image = '/product/' . Yii::$app->security->generateRandomString() . '/' . $this->imageFile->name;
         }
@@ -244,14 +249,12 @@ class Product extends ActiveRecord
             'success' => true
         ];
     }
-    
-    public function beforeSave($insert)
-    {
-        return parent::beforeSave($insert);
-    }
 
 
-    // delete image file with directory
+    /*
+     * remove image directory and image file
+     *
+     * */
     public function removeImageDirectory($directory): void
     {
         $fullPath = Yii::getAlias('@frontend/web/storage').$directory;
