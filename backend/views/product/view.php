@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute'=>'image',
                 /** @var \common\models\Product $model */
-                'value'=>fn($model)=>Html::img($model->getImgUrl(),['style'=>'width:80px']),
+                'value'=>fn($model)=>Html::img($model->getImgUrl($model->image),['style'=>'width:80px']),
                 'format'=>['html']
             ],
             'price',

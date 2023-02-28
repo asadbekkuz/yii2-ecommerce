@@ -95,6 +95,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         return Html::a('<i class="fas fa-trash"></i>', $url, [
                             'title' => Yii::t('app', 'Delete'),
                             'class'=>'btn btn-outline-danger btn-sm',
+                            'data-method'=>'post',
+                            'data-confirm'=>'Are you sure ?'
                         ]);
                     },
                 ],
