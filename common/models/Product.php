@@ -9,6 +9,7 @@ use yii\db\ActiveRecord;
 use yii\helpers\FileHelper;
 use yii\helpers\Html;
 use yii\helpers\StringHelper;
+use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 
@@ -155,17 +156,17 @@ class Product extends ActiveRecord
         return $saveModel;
     }
 
-    public function getImgUrl() : string
+    public function getImgUrl($image) : string
     {
-        return self::formatImageUrl($this->image);
+        return self::formatImageUrl($image);
     }
 
-    public static function formatImageUrl($imagePath) : string
+    public static function formatImageUrl($image) : string
     {
-        if ($imagePath) {
-            return Yii::$app->request->baseUrl . '/storage' . $imagePath;
+        if ($image) {
+            return  Yii::$app->params['imagePath'].$image;
         }
-        return Yii::$app->request->baseUrl . '/img/no-image.png';
+        return Yii::$app->params['imagePath'].'/img/no-image.png';
     }
 
     public function getStatus(?int $status)

@@ -4,6 +4,7 @@ use common\models\Product;
 use yii\helpers\Html;
 use common\grid\ActionColumn;
 use yii\grid\GridView;
+use yii\helpers\Url;
 
 /** @var yii\web\View $this */
 /** @var backend\models\search\ProductSearch $searchModel */
@@ -12,6 +13,7 @@ use yii\grid\GridView;
 
 $this->title = 'Products';
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
 <div class="product-index">
 
@@ -35,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute'=>'name',
                 'contentOptions'=>[
-                        'width'=>'90px'
+                        'width'=>'200px'
                 ]
             ],
             [
@@ -44,16 +46,16 @@ $this->params['breadcrumbs'][] = $this->title;
                     /**
                      * @var \common\models\Product $model
                      */
-                    return Html::img($model->getImgUrl(),[
-                            'style'=>'width:80px'
+                    return Html::img($model->getImgUrl($model->image),[
+                            'width'=>'120px'
                     ]);
                 }
             ],
             [
                 'attribute'=>'price',
-                'contentOptions'=>[
-                        'width'=>'80px'
-                ]
+                'content'=>function($model){
+                    return Yii::$app->formatter->asCurrency($model->price);
+                }
             ],
             [
                 'attribute'=>'status',
@@ -68,9 +70,37 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]
             ],
             'created_at:datetime',
-            'updated_at:datetime',
+//            'updated_at:datetime',
             [
-               'class'=>ActionColumn::class,
+                'class' => ActionColumn::className(),
+                'contentOptions'=>['width'=>'150px'],
+                'template' => '{view} {update} {delete}',
+                'buttons' => [
+                    //view button
+                    'view' => function ($url, $model) {
+                        return Html::a('<i class="fas fa-eye"></i>', $url, [
+                            'title' => Yii::t('app', 'View'),
+                            'class'=>'btn btn-outline-primary btn-sm',
+                        ]);
+                    },
+                    //update button
+                    'update' => function ($url, $model) {
+                        return Html::a('<i class="fas fa-pen"></i>', $url, [
+                            'title' => Yii::t('app', 'Update'),
+                            'class'=>'btn btn-outline-success btn-sm',
+                        ]);
+                    },
+                    //delete button
+                    'delete' => function ($url, $model) {
+                        return Html::a('<i class="fas fa-trash"></i>', $url, [
+                            'title' => Yii::t('app', 'Delete'),
+                            'class'=>'btn btn-outline-danger btn-sm',
+                        ]);
+                    },
+                ],
+                'urlCreator' => function ($action, Product $model, $key, $index, $column) {
+                    return Url::toRoute([$action, 'id' => $model->id]);
+                }
             ],
         ],
     ]); ?>
