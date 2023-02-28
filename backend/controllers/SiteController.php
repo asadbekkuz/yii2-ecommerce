@@ -2,12 +2,11 @@
 
 namespace backend\controllers;
 
-use common\models\LoginForm;
+use backend\models\LoginForm;
+use Yii;
 use common\models\Order;
 use common\models\OrderItem;
 use common\models\User;
-use PhpParser\Node\Expr\Array_;
-use Yii;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
