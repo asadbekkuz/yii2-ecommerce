@@ -17,6 +17,7 @@ class AppController extends Controller
      */
     public function actionCreateAdminUser($username, $password = null)
     {
-        \console\models\User::createAdminUser($username,$password);
+        $user = new \console\models\User();
+        \console\models\User::createAdminUser($user,$username,$password);
     }
 }
