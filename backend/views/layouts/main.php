@@ -125,11 +125,7 @@ AppAsset::register($this);
 
         <!-- Footer -->
         <footer class="sticky-footer bg-white">
-            <div class="container my-auto">
-                <div class="copyright text-center my-auto">
-                    <span>Copyright &copy; Your Website 2021</span>
-                </div>
-            </div>
+            <p class="pl-3">Copyright &copy; My Website 2023</p>
         </footer>
         <!-- End of Footer -->
 
