@@ -135,7 +135,6 @@ class SiteController extends Controller
             Yii::$app->session->setFlash('success', 'Thank you for registration. Please check your inbox for verification email.');
             return $this->goHome();
         }
-
         return $this->render('signup', [
             'model' => $model,
         ]);
