@@ -46,7 +46,7 @@ $this->title = 'My Yii Application';
                                 PRODUCTS SOLD
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                <?php echo $products ?>
+                                <?php echo $products ?? 0 ?>
                             </div>
                         </div>
                         <div class="col-auto">
