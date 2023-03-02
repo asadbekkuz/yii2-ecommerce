@@ -26,7 +26,7 @@ AppAsset::register($this);
 <div id="wrapper">
 
     <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+    <ul class="navbar-nav bg-custom-sidebar-gradient sidebar sidebar-dark accordion" id="accordionSidebar">
 
         <!-- Sidebar - Brand -->
         <a class="sidebar-brand d-flex align-items-center justify-content-center" href="<?php echo Yii::$app->homeUrl ?>">
@@ -73,7 +73,7 @@ AppAsset::register($this);
         <div id="content">
 
             <!-- Topbar -->
-            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+            <nav class="navbar navbar-expand navbar-light bg-custom-header topbar mb-4 static-top shadow">
 
                 <!-- Sidebar Toggle (Topbar) -->
                 <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
@@ -83,13 +83,11 @@ AppAsset::register($this);
                 <!-- Topbar Navbar -->
                 <ul class="navbar-nav ml-auto">
 
-
-
                     <!-- Nav Item - User Information -->
                     <li class="nav-item dropdown no-arrow">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 ">
                                 <?php echo Yii::$app->user->identity->getDisplayName() ?>
                             </span>
                             <img class="img-profile rounded-circle"
@@ -124,8 +122,10 @@ AppAsset::register($this);
         <!-- End of Main Content -->
 
         <!-- Footer -->
-        <footer class="sticky-footer bg-white">
-            <p class="pl-3">Copyright &copy; My Website 2023</p>
+        <footer class="bg-custom-footer text-white-50 h-auto">
+            <div class="container" style="margin-top: 20px">
+                <p class="float-center">&copy; <?= Html::encode('My Application') ?> <?= date('Y') ?></p>
+            </div>
         </footer>
         <!-- End of Footer -->
 
