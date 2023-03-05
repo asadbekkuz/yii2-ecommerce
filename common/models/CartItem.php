@@ -28,6 +28,40 @@ class CartItem extends \yii\db\ActiveRecord
         return 'cart_item';
     }
 
+    public static function clearCartItems(?int $currUserId)
+    {
+        if (isGuest()) {
+            Yii::$app->session->remove(CartItem::SESSION_KEY);
+        } else {
+            CartItem::deleteAll(['created_by' => $currUserId]);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['product_id', 'quantity', 'user_id'], 'required'],
+            [['product_id', 'quantity', 'user_id'], 'integer'],
+            [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::className(), 'targetAttribute' => ['product_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'product_id' => 'Product ID',
+            'quantity' => 'Quantity',
+            'user_id' => 'User ID',
+        ];
+    }
     public static function getTotalQuantity(?int $currUserId)
     {
         $sum = 0;
@@ -155,32 +189,6 @@ class CartItem extends \yii\db\ActiveRecord
         return [
             'success' => true,
             'quantity' => CartItem::getTotalQuantity(currUserId())
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
-    {
-        return [
-            [['product_id', 'quantity', 'user_id'], 'required'],
-            [['product_id', 'quantity', 'user_id'], 'integer'],
-            [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::className(), 'targetAttribute' => ['product_id' => 'id']],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'product_id' => 'Product ID',
-            'quantity' => 'Quantity',
-            'user_id' => 'User ID',
         ];
     }
 

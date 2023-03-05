@@ -84,15 +84,39 @@ class CartController extends Controller
     public function actionCheckout(): string
     {
 
-        $order = new Order();
-        $orderAddress = new OrderAddress();
+        $cartItems = CartItem::getItemsForUser(currUserId());
         $productQuantity = CartItem::getTotalQuantity(currUserId());
         $totalPrice = CartItem::getTotalPrice(currUserId());
 
+        if (empty($cartItems)) {
+            return $this->redirect([Yii::$app->homeUrl]);
+        }
+        $order = new Order();
+
+        $order->total_price = $totalPrice;
+        $order->status = Order::STATUS_DRAFT;
+        $order->created_at = time();
+        $order->created_by = currUserId();
+        $transaction = Yii::$app->db->beginTransaction();
+        if ($order->load(Yii::$app->request->post())
+            && $order->save()
+            && $order->saveAddress(Yii::$app->request->post())
+            && $order->saveOrderItems()) {
+            $transaction->commit();
+
+            CartItem::clearCartItems(currUserId());
+
+            return $this->render('pay-now', [
+                'order' => $order,
+            ]);
+        }
+
+        $orderAddress = new OrderAddress();
         if (!isGuest()) {
-            /** @var User $user */
+            /** @var \common\models\User $user */
             $user = Yii::$app->user->identity;
             $userAddress = $user->getAddress();
+
             $order->firstname = $user->firstname;
             $order->lastname = $user->lastname;
             $order->email = $user->email;
@@ -108,37 +132,12 @@ class CartController extends Controller
         return $this->render('checkout', [
             'order' => $order,
             'orderAddress' => $orderAddress,
+            'cartItems' => $cartItems,
             'productQuantity' => $productQuantity,
             'totalPrice' => $totalPrice
         ]);
     }
-
-//    public function actionCreateOrder(): array
-//    {
-//        $transactionId= Yii::$app->request->post('transactionId');
-//        $status= Yii::$app->request->post('status');
-//        $order = new Order();
-//        $order->transaction_id = $transactionId;
-//        $order->status = $status === "COMPLETED" ? Order::STATUS_COMPLETED : Order::STATUS_FAILURED;
-//        if($order->load(Yii::$app->request->post()) && $order->save()){
-//            $orderAddress = new OrderAddress();
-//            $orderAddress->order_id = $order->id;
-//            if($orderAddress->load(Yii::$app->request->post()) && $orderAddress->save() && $order->saveOrder()){
-//                return [
-//                    'success'=>true
-//                ];
-//            }
-//            return [
-//                'success'=>false,
-//                'errors'=>$orderAddress->errors
-//            ];
-//        }
-//        return [
-//            'success'=>false,
-//            'errors'=>$order->errors
-//        ];
-//    }
-      /**
+     /**
        *  create order and save User address and information, or update
       */
     public function actionCreateOrder()

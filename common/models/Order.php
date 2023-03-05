@@ -96,22 +96,20 @@ class Order extends \yii\db\ActiveRecord
         return new \common\models\query\OrderQuery(get_called_class());
     }
 
-    public function saveOrderItems($id)
+    public function saveOrderItems()
     {
-        $transaction = Yii::$app->db->beginTransaction();
         $cartItems = CartItem::getItemsForUser(currUserId());
         foreach ($cartItems as $cartItem) {
             $orderItem = new OrderItem();
             $orderItem->product_name = $cartItem['name'];
             $orderItem->product_id = $cartItem['id'];
             $orderItem->unit_price = $cartItem['price'];
-            $orderItem->order_id = $id;
+            $orderItem->order_id = $this->id;
             $orderItem->quantity = $cartItem['quantity'];
-            if(!$orderItem->save()){
-                throw new Exception('Order items was not save:'.implode('<br/>',$orderItem->getFirstErrors()));
+            if (!$orderItem->save()) {
+                throw new Exception("Order item was not saved: " . implode('<br>', $orderItem->getFirstErrors()));
             }
         }
-        $transaction->commit();
         return true;
     }
 
