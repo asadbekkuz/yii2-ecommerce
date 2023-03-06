@@ -72,7 +72,7 @@ class Order extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery|\common\models\query\OrderAddressQuery
      */
-    public function getOrderAddresses()
+    public function getOrderAddress()
     {
         return $this->hasMany(OrderAddress::className(), ['order_id' => 'id']);
     }
@@ -82,7 +82,7 @@ class Order extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery|\common\models\query\OrderItemQuery
      */
-    public function getOrdersItems()
+    public function getOrderItems()
     {
         return $this->hasMany(OrderItem::className(), ['order_id' => 'id']);
     }
@@ -128,10 +128,10 @@ class Order extends \yii\db\ActiveRecord
         }
         return false;
     }
-    public function saveOrderAddress($postData,$id): bool
+    public function saveOrderAddress($postData): bool
     {
         $orderAddress = new OrderAddress();
-        $orderAddress->order_id = $id;
+        $orderAddress->order_id = $this->id;
         if($orderAddress->load($postData) && $orderAddress->save()){
             return true;
         }
@@ -144,6 +144,7 @@ class Order extends \yii\db\ActiveRecord
         $fullName = $this->firstname.' '.$this->lastname;
         return $fullName ?? 'Unknown User';
     }
+
     // Html label for Order status
     public function getStatusLabel($status)
     {
@@ -172,5 +173,17 @@ class Order extends \yii\db\ActiveRecord
 //            $label = Html::tag('span','Draft',['class'=>'btn btn-secondary btn-sm']);
 //        }
         return $label;
+    }
+
+
+    /**
+     *
+     *  Get Items Quantity
+     * */
+    public function getItemsQuantity()
+    {
+        return $sum = CartItem::findBySql(
+            "SELECT SUM(quantity) FROM orders_items WHERE order_id = :orderId", ['orderId' => $this->id]
+        )->scalar();
     }
 }

@@ -12,9 +12,7 @@ use yii\helpers\Url;
 <div class="row">
     <div class="col">
         <?php $form = ActiveForm::begin([
-                'id'=>'checkout-form',
-                'action'=>Url::to(['/cart/create-order'])
-        ]); ?>
+                'id'=>'checkout-form']) ?>
             <div class="card">
                 <div class="card-header">
                     <h5>Account Information</h5>

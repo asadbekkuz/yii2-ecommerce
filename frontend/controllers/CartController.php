@@ -89,10 +89,9 @@ class CartController extends Controller
         $totalPrice = CartItem::getTotalPrice(currUserId());
 
         if (empty($cartItems)) {
-            return $this->redirect([Yii::$app->homeUrl]);
+             return   $this->redirect([Yii::$app->homeUrl]);
         }
         $order = new Order();
-
         $order->total_price = $totalPrice;
         $order->status = Order::STATUS_DRAFT;
         $order->created_at = time();
@@ -100,11 +99,11 @@ class CartController extends Controller
         $transaction = Yii::$app->db->beginTransaction();
         if ($order->load(Yii::$app->request->post())
             && $order->save()
-            && $order->saveAddress(Yii::$app->request->post())
+            && $order->saveOrderAddress(Yii::$app->request->post())
             && $order->saveOrderItems()) {
             $transaction->commit();
 
-            CartItem::clearCartItems(currUserId());
+//            CartItem::clearCartItems(currUserId());
 
             return $this->render('pay-now', [
                 'order' => $order,
@@ -140,25 +139,25 @@ class CartController extends Controller
      /**
        *  create order and save User address and information, or update
       */
-    public function actionCreateOrder()
-    {   
-        $order = new Order();
-        $orderAddress = new OrderAddress();
-        $postData = Yii::$app->request->post();
-        $totalPrice = CartItem::getTotalPrice(currUserId());
-        $productQuantity = CartItem::getTotalQuantity(currUserId());
-
-        if($order->load($postData)
-            && $order->saveOrder($postData,$totalPrice)){
-
-            return $this->render('submit-payment',[
-                'order' => $order,
-                'orderAddress' =>$orderAddress, 
-                'productQuantity' => $productQuantity,
-                'totalPrice' => $totalPrice
-            ]);
-        }
-        throw new BadRequestHttpException();
-    }
+//    public function actionCreateOrder()
+//    {
+//        $order = new Order();
+//        $orderAddress = new OrderAddress();
+//        $postData = Yii::$app->request->post();
+//        $totalPrice = CartItem::getTotalPrice(currUserId());
+//        $productQuantity = CartItem::getTotalQuantity(currUserId());
+//
+//        if($order->load($postData)
+//            && $order->saveOrder($postData,$totalPrice)){
+//
+//            return $this->render('submit-payment',[
+//                'order' => $order,
+//                'orderAddress' =>$orderAddress,
+//                'productQuantity' => $productQuantity,
+//                'totalPrice' => $totalPrice
+//            ]);
+//        }
+//        throw new BadRequestHttpException();
+//    }
 
 }

@@ -2,7 +2,7 @@
 
 namespace common\models;
 
-use Faker\Core\File;
+
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
@@ -164,15 +164,15 @@ class Product extends ActiveRecord
         return $saveModel;
     }
 
-    public static function getImgUrl($image) : string
+    public  function getImgUrl() : string
     {
-        return self::formatImageUrl($image);
+        return self::formatImageUrl($this->image);
     }
 
-    public static function formatImageUrl($image) : string
+    public static  function formatImageUrl($imagePath) : string
     {
-        if ($image) {
-            return  Yii::$app->params['imagePath'].$image;
+        if ($imagePath) {
+            return  Yii::$app->params['imagePath'].$imagePath;
         }
         return Yii::$app->params['imagePath'].'/img/no-image.png';
     }
