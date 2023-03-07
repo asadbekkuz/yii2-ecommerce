@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\BlameableBehavior;
 use yii\db\Exception;
 use yii\helpers\Html;
 
@@ -16,6 +17,7 @@ use yii\helpers\Html;
  * @property string $lastname
  * @property string $email
  * @property string|null $transaction_id
+ * @property string|null $paypal_order_id
  * @property int|null $created_at
  * @property int|null $created_by
  *
@@ -45,7 +47,7 @@ class Order extends \yii\db\ActiveRecord
             [['total_price', 'firstname', 'lastname', 'email'], 'required'],
             [['total_price'], 'number'],
             [['status', 'created_at', 'created_by'], 'integer'],
-            [['firstname', 'lastname', 'email', 'transaction_id'], 'string', 'max' => 255],
+            [['firstname', 'lastname', 'email', 'transaction_id','paypal_order_id'], 'string', 'max' => 255],
         ];
     }
 
@@ -62,6 +64,7 @@ class Order extends \yii\db\ActiveRecord
             'lastname' => 'Lastname',
             'email' => 'Email',
             'transaction_id' => 'Transaction ID',
+            'paypal_order_id' => 'Paypal Order ID',
             'created_at' => 'Created At',
             'created_by' => 'Created By',
         ];
@@ -163,15 +166,6 @@ class Order extends \yii\db\ActiveRecord
             break;
             default: $label ='Error';
         }
-//        if($status === Order::STATUS_COMPLETED){
-//            $label = Html::tag('span','Completed',['class'=>'btn btn-success btn-sm']);
-//        }else if ($status === Order::STATUS_PAID){
-//            $label = Html::tag('span','Paid',['class'=>'btn btn-primary btn-sm']);
-//        }else if($status === Order::STATUS_FAILED){
-//            $label = Html::tag('span','Failed',['class'=>'btn btn-danger btn-sm']);
-//        }else{
-//            $label = Html::tag('span','Draft',['class'=>'btn btn-secondary btn-sm']);
-//        }
         return $label;
     }
 
@@ -186,4 +180,33 @@ class Order extends \yii\db\ActiveRecord
             "SELECT SUM(quantity) FROM orders_items WHERE order_id = :orderId", ['orderId' => $this->id]
         )->scalar();
     }
+
+    public function sendEmailToVendor()
+    {
+        return Yii::$app
+            ->mailer
+            ->compose(
+                ['html' => 'order_completed_vendor-html', 'text' => 'order_completed_vendor-text'],
+                ['order' => $this]
+            )
+            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' robot'])
+            ->setTo(Yii::$app->params['vendorEmail'])
+            ->setSubject('New Order has been made ' . Yii::$app->name)
+            ->send();
+    }
+
+    public function sendEmailToCustomer()
+    {
+        return Yii::$app
+            ->mailer
+            ->compose(
+                ['html' => 'order_completed_customer-html', 'text' => 'order_completed_customer-text'],
+                ['order' => $this]
+            )
+            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' robot'])
+            ->setTo($this->email)
+            ->setSubject('Your order confirmed at ' . Yii::$app->name)
+            ->send();
+    }
+
 }

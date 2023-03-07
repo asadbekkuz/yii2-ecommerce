@@ -40,7 +40,8 @@ return [
         'assetManager'=>[
             'bundles'=>[
 //                'yii\bootstrap5\BootstrapAsset'=>false
-            ]
+            ],
+            'appendTimestamp'=>true
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
@@ -48,7 +49,6 @@ return [
             'rules' => [
             ],
         ],
-
     ],
     'params' => $params,
 ];

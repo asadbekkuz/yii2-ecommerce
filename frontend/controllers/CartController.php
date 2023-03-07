@@ -3,15 +3,19 @@
 namespace frontend\controllers;
 
 
+use PayPalCheckoutSdk\Core\PayPalHttpClient;
+use PayPalCheckoutSdk\Core\SandboxEnvironment;
+use PayPalCheckoutSdk\Orders\OrdersGetRequest;
+use PayPalCheckoutSdk\Payments\AuthorizationsGetRequest;
+use Yii;
 use common\models\Order;
 use common\models\OrderAddress;
 use common\models\Product;
-use common\models\User;
-use Yii;
 use common\models\CartItem;
 use yii\filters\ContentNegotiator;
 use frontend\base\Controller;
 use yii\filters\VerbFilter;
+use yii\helpers\VarDumper;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -26,7 +30,7 @@ class CartController extends Controller
         return [
             [
                 'class' => ContentNegotiator::class,
-                'only' => ['add', 'change-quantity'],
+                'only' => ['add', 'change-quantity','submit-payment'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON
                 ]
@@ -89,7 +93,7 @@ class CartController extends Controller
         $totalPrice = CartItem::getTotalPrice(currUserId());
 
         if (empty($cartItems)) {
-             return   $this->redirect([Yii::$app->homeUrl]);
+            return $this->redirect(['/site/index']);
         }
         $order = new Order();
         $order->total_price = $totalPrice;
@@ -103,7 +107,7 @@ class CartController extends Controller
             && $order->saveOrderItems()) {
             $transaction->commit();
 
-//            CartItem::clearCartItems(currUserId());
+            CartItem::clearCartItems(currUserId());
 
             return $this->render('pay-now', [
                 'order' => $order,
@@ -136,28 +140,63 @@ class CartController extends Controller
             'totalPrice' => $totalPrice
         ]);
     }
-     /**
-       *  create order and save User address and information, or update
-      */
-//    public function actionCreateOrder()
-//    {
-//        $order = new Order();
-//        $orderAddress = new OrderAddress();
-//        $postData = Yii::$app->request->post();
-//        $totalPrice = CartItem::getTotalPrice(currUserId());
-//        $productQuantity = CartItem::getTotalQuantity(currUserId());
-//
-//        if($order->load($postData)
-//            && $order->saveOrder($postData,$totalPrice)){
-//
-//            return $this->render('submit-payment',[
-//                'order' => $order,
-//                'orderAddress' =>$orderAddress,
-//                'productQuantity' => $productQuantity,
-//                'totalPrice' => $totalPrice
-//            ]);
-//        }
-//        throw new BadRequestHttpException();
-//    }
 
+    /**
+     *  Check Transaction Id 
+     * 
+     */
+    public function actionSubmitPayment($orderId){
+        $where = ['id'=>$orderId,'status'=>Order::STATUS_DRAFT];
+        if(!isGuest()){
+            $where['created_by'] = currUserId();
+        }
+        $order = Order::findOne($where);
+        if(!$order){
+            throw new NotFoundHttpException("Order not found");
+        }
+        $paypalOrderId = Yii::$app->request->post('paypalOrderId');
+        $exist = Order::find()->andWhere(['paypal_order_id'=>$paypalOrderId])->exists();
+
+        if($exist){
+            throw new BadRequestHttpException();
+        }
+        // Creating an environment
+        $clientId = Yii::$app->params['paypalClientId'];
+        $clientSecret = Yii::$app->params['paypalSecretId'];
+
+        $environment = new SandboxEnvironment($clientId, $clientSecret);
+        $client = new PayPalHttpClient($environment);
+        $response = $client->execute(new OrdersGetRequest($paypalOrderId));
+
+        if ($response->statusCode === 200) {
+            $order->paypal_order_id = $paypalOrderId;
+            $paidAmount = 0;
+            foreach ($response->result->purchase_units as $purchase_unit) {
+                if ($purchase_unit->amount->currency_code === 'USD') {
+                    $paidAmount += $purchase_unit->amount->value;
+                }
+            }
+            if ($paidAmount === (float)$order->total_price && $response->result->status === 'COMPLETED') {
+                $order->status = Order::STATUS_PAID;
+            }
+            $order->transaction_id = $response->result->purchase_units[0]->payments->captures[0]->id;
+            if  ($order->save()) {
+                if (!$order->sendEmailToVendor()) {
+                    Yii::error("Email to the vendor is not sent");
+                }
+                if (!$order->sendEmailToCustomer()) {
+                    Yii::error("Email to the customer is not sent");
+                }
+
+                return [
+                    'success' => true
+                ];
+            } else {
+                Yii::error("Order was not saved. Data: ".VarDumper::dumpAsString($order->toArray()).
+                    '. Errors: '.VarDumper::dumpAsString($order->errors));
+            }
+        }
+
+        throw new BadRequestHttpException();
+    }
 }

@@ -1,0 +1,8 @@
+
+POST https://api-m.sandbox.paypal.com/v1/oauth2/token
+Authorization: Basic <AT5ZbD4lEn8umpgHB3EyrbVj-yQmD_7kzsEFKOY7QohKyHTG5vEZlS4ipDAyItSRpmwIDvGKPphi3kxn> <ELMCWmWKmyuRBsHQO5vz2uyPl0uSbLDZQGRqQ269AzytDYabGYlHbUvKyc1TdkoO4AXxgSi9QNggOrQe>
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials
+
+
