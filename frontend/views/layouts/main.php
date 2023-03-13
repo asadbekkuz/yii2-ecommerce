@@ -9,6 +9,7 @@ use frontend\assets\AppAsset;
 use yii\bootstrap5\Html;
 use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
+use yii\helpers\Url;
 
 $cartItems = $this->params['cartItem'];
 AppAsset::register($this);
@@ -40,9 +41,10 @@ AppAsset::register($this);
             'label' => "Cart <span class='badge bg-danger' id='product-counter'>" . $cartItems . "</span>",
             'url' => ['/cart/index'],
         ];
+
         if (Yii::$app->user->isGuest) {
-            $menuItems[] = ['label' => 'Signup', 'url' => ['/site/signup']];
-            $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
+            $menuItems[] = ['label' => Yii::t('app','Signup'), 'url' => ['/site/signup']];
+            $menuItems[] = ['label' => Yii::t('app','Login'), 'url' => ['/site/login']];
         } else {
             $menuItems[] = [
                 'label' => Yii::$app->user->identity->getDisplayName(),
@@ -82,7 +84,6 @@ AppAsset::register($this);
             <p class="float-end"><?= Yii::powered() ?></p>
         </div>
     </footer>
-
     <?php $this->endBody() ?>
     </body>
     </html>

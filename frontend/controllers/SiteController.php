@@ -2,10 +2,10 @@
 
 namespace frontend\controllers;
 
+use Yii;
 use common\models\Product;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
-use Yii;
 use yii\base\InvalidArgumentException;
 use yii\data\ActiveDataProvider;
 use yii\web\BadRequestHttpException;
@@ -84,6 +84,7 @@ class SiteController extends Controller
                 'pageSize'=>3
             ]
         ]);
+
         return $this->render('index',[
             'dataProvider'=>$dataProvider
         ]);
@@ -231,5 +232,20 @@ class SiteController extends Controller
         return $this->render('resendVerificationEmail', [
             'model' => $model
         ]);
+    }
+
+    public function actionChangeLanguage($q){
+        switch ($q){
+            case 'uz':
+                Yii::$app->language = 'uz';
+                break;
+            case 'ru':
+                Yii::$app->language = 'ru';
+                break;
+            case 'en':
+                Yii::$app->language = 'en';
+                break;
+            default: $this->redirect('/');
+        }
     }
 }

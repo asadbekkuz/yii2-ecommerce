@@ -12,7 +12,7 @@ class CartAsset extends AssetBundle
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
-        'css/cart/cart.css',
+        'build/cart.js'
     ];
     public $depends = [
         'yii\web\YiiAsset',
